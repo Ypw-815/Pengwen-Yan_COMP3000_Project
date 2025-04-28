@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Personal Center</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', 'Open Sans', sans-serif;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            background-color: #f5f7fb;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+
+        form {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        input {
+            width: 95%;
+            padding: 0.8rem;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        button {
+            background: #3498db;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+        }
+
+        button:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        .message {
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .message.success {
+            background: #d5f5e3;
+            color: #27ae60;
+        }
+
+        .message.error {
+            background: #fceae9;
+            color: #e74c3c;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 0 1rem;
+            }
+
+            form {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Personal Center</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="username">UserName</label>
+        <input type="text" id="username" name="username" value="{{ user.username }}">
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="{{ user.email }}">
+
+        <button type="submit">Save changes</button>
+    </form>
+
+    <p>
+        <a href="{% url 'password_change' %}" style="color: #3498db; text-decoration: none;">Change Password</a>
+    </p>
+</body>
+</html>

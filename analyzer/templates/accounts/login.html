@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login and Register Page</title>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #74b9ff, #a29bfe);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            border-color: #74b9ff;
+            outline: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            background: #74b9ff;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #0984e3;
+        }
+
+        .switch-form {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .switch-form a {
+            color: #74b9ff;
+            text-decoration: none;
+        }
+
+        .switch-form a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #ff7675;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .intro {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .examples {
+            margin-top: 20px;
+            color: #555;
+            font-size: 12px;
+        }
+
+        .examples h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .examples p {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Introduction Section -->
+        <div class="intro">
+            <p>Welcome to our Emotion Analysis Platform!</p>
+            <p>Our platform helps you understand and analyze the emotions behind text. Whether it's customer feedback, social media posts, or personal notes, we provide insights into the emotional tone of the content.</p>
+        </div>
+
+        <!-- Login Form -->
+        <div id="login-form">
+            <h2>Login</h2>
+            <form id="login-form-submit">
+                <div class="form-group">
+                    <label for="login-username">Username</label>
+                    <input type="text" id="login-username" placeholder="Enter your username" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+            <div class="switch-form">
+                Don't have an account? <a href="#" onclick="switchToRegister()">Register now</a>
+            </div>
+        </div>
+
+        <!-- Register Form -->
+        <div id="register-form" style="display: none;">
+            <h2>Register</h2>
+            <form id="register-form-submit">
+                <div class="form-group">
+                    <label for="register-username">Username</label>
+                    <input type="text" id="register-username" placeholder="Enter your username" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <input type="password" id="register-password" placeholder="Enter your password" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-confirm-password">Confirm Password</label>
+                    <input type="password" id="register-confirm-password" placeholder="Confirm your password" required>
+                    <div id="password-error" class="error-message">Passwords do not match, please try again.</div>
+                </div>
+                <button type="submit" class="btn">Register</button>
+            </form>
+            <div class="switch-form">
+                Already have an account? <a href="#" onclick="switchToLogin()">Login now</a>
+            </div>
+        </div>
+
+        <!-- Examples Section -->
+        <div class="examples">
+            <h3>Examples of Emotion Analysis:</h3>
+            <p>"I'm so happy with the service!" - Positive</p>
+            <p>"This is the worst experience ever." - Negative</p>
+            <p>"I feel indifferent about the results." - Neutral</p>
+        </div>
+    </div>
+
+    <script>
+        // Switch form display
+        function switchToRegister() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'block';
+        }
+
+        function switchToLogin() {
+            document.getElementById('register-form').style.display = 'none';
+            document.getElementById('login-form').style.display = 'block';
+        }
+
+        document.getElementById('register-form-submit').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const username = document.getElementById('register-username').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            const errorMessage = document.getElementById('password-error');
+
+            // Validate password consistency
+            if (password !== confirmPassword) {
+                errorMessage.style.display = 'block';
+                return; // Stop further action if passwords do not match
+            } else {
+                errorMessage.style.display = 'none';
+            }
+
+            // Construct registration data
+            const userData = {
+                username: username,
+                email: email,
+                password: password
+            };
+
+            fetch('/user_register/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Registration successful!');
+                    // Redirect to login page or other page after successful registration
+                    window.location.href = '/login/';
+                } else {
+                    alert('Registration failed: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Registration request failed:', error);
+                alert('Registration request failed, please try again later.');
+            });
+        });
+
+        document.getElementById('login-form-submit').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+
+            const userData = {
+                username: username,
+                password: password
+            };
+
+            fetch('/user_login/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.location.href = '/';  // Redirect to homepage
+                } else {
+                    alert('Login failed: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Login request failed:', error);
+            });
+        });
+
+        // Function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

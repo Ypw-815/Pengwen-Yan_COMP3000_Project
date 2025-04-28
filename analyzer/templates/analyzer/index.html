@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sentiment Analysis</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', 'Open Sans', sans-serif;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            background-color: #f5f7fb;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+
+        form {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        textarea {
+            width: 95%;
+            padding: 1rem;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        button {
+            background: #3498db;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+            display: block;
+            margin: 1rem auto 0;
+            position: relative;
+        }
+
+        button:hover:not(:disabled) {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin-top: -8px;
+            margin-left: -8px;
+            border: 2px solid #fff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-container {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .result {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            flex: 1;
+            min-width: 300px;
+            margin-bottom: 1rem;
+        }
+
+        .result h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.2rem;
+        }
+
+        .error {
+            color: #e74c3c;
+            background: #fceae9;
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin: 0;
+        }
+
+        p {
+            font-size: 1.1rem;
+            margin: 0.5rem 0;
+        }
+
+        /* Sentiment label styles */
+        [class*="label"] {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .label-positive {
+            background: #27ae60;
+            color: white;
+        }
+
+        .label-neutral {
+            background: #f1c40f;
+            color: white;
+        }
+
+        .label-negative {
+            background: #e74c3c;
+            color: white;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 0 1rem;
+            }
+
+            form {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Navigation bar styles */
+        nav {
+            position: relative;
+            top: 1rem;
+            right: 1.5rem;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            flex-direction: row-reverse;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+
+        nav button:hover {
+            color: #3498db;
+        }
+
+        nav div {
+            position: relative;
+        }
+
+        nav div div {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #e0e6ed;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 0.5rem;
+            min-width: 150px;
+            z-index: 1000;
+            display: none;
+        }
+
+        nav div:hover div {
+            display: block;
+        }
+
+        nav div a {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: #333;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        nav div a:hover {
+            background: #f5f7fb;
+        }
+
+        /* 通用模块样式 */
+        .result {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            flex: 1;
+            min-width: 300px;
+            margin-bottom: 1rem;
+        }
+
+        .result h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.2rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+
+        .result p {
+            font-size: 1rem;
+            margin: 0.5rem 0;
+        }
+
+        /* 图标样式 */
+        .result .icon {
+            margin-right: 0.5rem;
+            color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation bar -->
+    <nav>
+        <div style="position: relative;">
+            <button style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #2c3e50; display: flex; align-items: center;">
+                <span style="margin-right: 0.5rem;">{{ user.username }}</span>
+                <span>▼</span>
+            </button>
+            <div style="position: absolute; top: 100%; right: 0; background: white; border: 1px solid #e0e6ed; border-radius: 6px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); margin-top: 0.5rem; min-width: 150px; z-index: 1000; display: none;">
+                <a href="{% url 'profile' %}" style="display: block; padding: 0.5rem 1rem; color: #333; text-decoration: none; transition: background 0.3s;">Profile</a>
+                <a href="{% url 'datafile' %}" style="display: block; padding: 0.5rem 1rem; color: #333; text-decoration: none; transition: background 0.3s;">Data Statistics</a>
+                <a href="{% url 'user_logout' %}" style="display: block; padding: 0.5rem 1rem; color: #333; text-decoration: none; transition: background 0.3s;">Logout</a>
+            </div>
+        </div>
+    </nav>
+    <h1>📊 Text Sentiment Analysis</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <textarea id="text-input" name="text" rows="4" placeholder="Please enter English text..." required>{% if text %}{{ text }}{% endif %}</textarea>
+        <input type="file" name="file" id="file-input" accept=".txt" style="margin: 1rem 0;">
+        <button type="submit" id="analyze-button">Analyze</button>
+    </form>
+
+    <div class="result-container">
+        {% if local_result %}
+            <div class="result">
+                <h3>🔍 Local Model Analysis (DistilBERT)</h3>
+                {% if local_result.error %}
+                    <p class="error">{{ local_result.error }}</p>
+                {% else %}
+                    <p>Sentiment: <span class="label-{{ local_result.label|lower }}">{{ local_result.label }}</span></p>
+                    <p>Confidence: {{ local_result.score|floatformat:3 }}</p>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if deepseek_result %}
+            <div class="result">
+                <h3>🧠 Deep Analysis (DeepSeek)</h3>
+                {% if deepseek_result.error %}
+                    <p class="error">{{ deepseek_result.error }}</p>
+                {% else %}
+                    <p>Sentiment: <span class="label-{{ deepseek_result.label|lower }}">{{ deepseek_result.label }}</span></p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- 性格分析模块 -->
+    <div class="result">
+        <h3>性格分析</h3>
+        <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+            <div style="background: #e74c3c; color: white; width: 80px; height: 80px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2rem; margin-right: 1rem;">ME</div>
+            <div>
+                <div style="display: flex; align-items: center;">
+                    <h4 style="margin: 0; margin-right: 1rem;">ISFJ</h4>
+                    <span>85.0%</span>
+                    <span>75.0%</span>
+                </div>
+                <p style="margin: 0.5rem 0; font-size: 0.9rem;">根据分析，您可能是一位年轻的大学生，性别为男性，对家庭和学业有着高度的责任感...</p>
+            </div>
+        </div>
+    </div>
+    <!-- 生活建议模块 -->
+    <div class="result">
+        <h3>生活建议</h3>
+        <p>尝试每天花10分钟进行冥想，帮助减轻压力并提高专注力。</p>
+    </div>
+    <!-- 礼物推荐模块 -->
+    <div class="result">
+        <h3>礼物推荐</h3>
+        <p>推荐购买一款智能手环，帮助您更好地管理健康和监测日常活动。</p>
+    </div>
+    <!-- 前世分析模块 -->
+    <div class="result">
+        <h3>前世分析</h3>
+        <p>在前世，您可能是一位社区的领导者，致力于改善社区的生活质量。</p>
+    </div>
+    <!-- 动物相关性模块 -->
+    <div class="result">
+        <h3>动物相关性</h3>
+        <p>您的性格与忠诚、勤奋的金毛犬相似。</p>
+    </div>
+    <!-- 友谊建议模块 -->
+    <div class="result">
+        <h3>友谊建议</h3>
+        <ul style="padding-left: 1rem;">
+            <li>与您交流时，保持诚实和开放</li>
+            <li>理解您的责任感，并给予支持</li>
+            <li>在需要时提供帮助，她会很感激</li>
+        </ul>
+    </div>
+
+</body>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const userButton = document.querySelector('nav button');
+        const dropdownMenu = document.querySelector('nav div div');
+        const analyzeButton = document.getElementById('analyze-button');
+        const form = document.querySelector('form');
+
+        userButton.addEventListener('click', function() {
+            dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('nav div')) {
+                dropdownMenu.style.display = 'none';
+            }
+        });
+
+        form.addEventListener('submit', function() {
+            analyzeButton.disabled = true;
+            analyzeButton.classList.add('loading');
+        });
+
+
+
+
+        const fileInput = document.getElementById('file-input');
+        fileInput.addEventListener('change', function(event) {
+            const textInput = document.getElementById('text-input')
+             if (textInput) {
+                textInput.value = "Analyze emotional text:" +
+                    " ";
+             }
+        })
+    });
+
+
+</script>
+</html>

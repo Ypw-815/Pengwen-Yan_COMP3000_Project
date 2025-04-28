@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Emotion Analysis Record</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', 'Open Sans', sans-serif;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            background-color: #f5f7fb;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e6ed;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background-color: #f5f7fb;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .emotion-index {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            color: #2c3e50;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 0 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Emotion Analysis Record</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Text</th>
+                <th>Local Model Result</th>
+                <th>DeepSeek Result</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+                <tr>
+                    <td>{{ result.created_at }}</td>
+                    <td>{{ result.text|truncatechars:50 }}</td>
+                    <td>{{ result.local_label }}</td>
+                    <td>{{ result.deepseek_label }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="chart-container">
+        <canvas id="sentimentChart"></canvas>
+    </div>
+
+    <div class="emotion-index">
+        <p>情绪指数：{{ emotion_index|floatformat:3 }}</p>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('sentimentChart').getContext('2d');
+        const sentimentChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Positive', 'Negative', 'Neutral'],
+                datasets: [{
+                    label: 'Sentiment Distribution',
+                    data: [
+                        {{ positive_count }},
+                        {{ negative_count }},
+                        {{ neutral_count }}
+                    ],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.8)', // Positive
+                        'rgba(255, 99, 132, 0.8)', // Negative
+                        'rgba(255, 206, 86, 0.8)', // Neutral
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        enabled: true,
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
